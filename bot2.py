@@ -54,4 +54,4 @@ async def id(ctx):
     await ctx.send(f"Seu id é {user_id}")
 
 
-bot.run('MTQ0MzMxODk5Nzk3MzA3Mzk1Mw.G3t_ri.H0xoZ5dcolMi_DE__lMTfsYclVrSs6lpg4b8hw')
+bot.run('')
