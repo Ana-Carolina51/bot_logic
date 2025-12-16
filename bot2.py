@@ -55,11 +55,3 @@ async def id(ctx):
 
 
 bot.run('MTQ0MzMxODk5Nzk3MzA3Mzk1Mw.G3t_ri.H0xoZ5dcolMi_DE__lMTfsYclVrSs6lpg4b8hw')
-
-@bot.command()
-async def mem(ctx):
-    with open('/mem1.jpg', 'rb') as f:
-        #Vamos armazenar o arquivo convertido da biblioteca do Discord nesta variável!
-        picture = discord.File(f)
-    # Podemos então enviar esse arquivo como um parâmetro
-    await ctx.send(file=picture)
