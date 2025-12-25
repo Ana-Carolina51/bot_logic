@@ -1,6 +1,8 @@
 import discord
 from discord.ext import commands
 import random
+import os
+
 # Importar pass_gen do bot_logic.py  
 from geradorsenha import pass_gen
 
@@ -53,13 +55,14 @@ async def id(ctx):
     user_id = ctx.author.id
     await ctx.send(f"Seu id é {user_id}")
 
-
 @bot.command()
-async def mem(ctx):
-    with open('/mem1.jpg', 'rb') as f:
-        #Vamos armazenar o arquivo convertido da biblioteca do Discord nesta variável!
+async def meme(ctx):
+    arquivos = os.listdir("memes")
+    meme = random.choice(arquivos)
+
+    with open(f"memes/{meme}", "rb") as f:
         picture = discord.File(f)
-    # Podemos então enviar esse arquivo como um parâmetro
+
     await ctx.send(file=picture)
 
 @bot.command()
