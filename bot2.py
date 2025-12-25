@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 import random
 # Importar pass_gen do bot_logic.py  
-from bot_logic import pass_gen
+from geradorsenha import pass_gen
 
 # A variável intents armazena as permissões do bot
 intents = discord.Intents.default()
@@ -53,5 +53,73 @@ async def id(ctx):
     user_id = ctx.author.id
     await ctx.send(f"Seu id é {user_id}")
 
+
+@bot.command()
+async def mem(ctx):
+    with open('/mem1.jpg', 'rb') as f:
+        #Vamos armazenar o arquivo convertido da biblioteca do Discord nesta variável!
+        picture = discord.File(f)
+    # Podemos então enviar esse arquivo como um parâmetro
+    await ctx.send(file=picture)
+
+@bot.command()
+async def dado(ctx):
+    numero = random.randint(1, 6)
+    await ctx.send(f"🎲 O dado caiu em **{numero}**!")
+
+@bot.command()
+async def ppt(ctx, escolha: str = None):
+    if escolha is None:
+        await ctx.send("❌ Use: `$ppt pedra | papel | tesoura`")
+        return
+
+    escolha = escolha.lower()
+    opcoes = ["pedra", "papel", "tesoura"]
+
+    if escolha not in opcoes:
+        await ctx.send("❌ Escolha inválida. Use: pedra, papel ou tesoura.")
+        return
+
+    bot_escolha = random.choice(opcoes)
+
+    if escolha == bot_escolha:
+        resultado = "🤝 Empate!"
+    elif (
+        (escolha == "pedra" and bot_escolha == "tesoura") or
+        (escolha == "papel" and bot_escolha == "pedra") or
+        (escolha == "tesoura" and bot_escolha == "papel")
+    ):
+        resultado = "🎉 Você ganhou!"
+    else:
+        resultado = "❌ Você perdeu!"
+
+    await ctx.send(
+        f"🧠 Você escolheu **{escolha}**\n"
+        f"🤖 Bot escolheu **{bot_escolha}**\n\n"
+        f"{resultado}"
+    )
+
+@bot.command()
+@commands.has_permissions(manage_messages=True)
+async def clear(ctx, quantidade: int):
+    if quantidade <= 0:
+        await ctx.send("❌ Use um número maior que 0.")
+        return
+
+    # +1 para apagar a mensagem do comando também
+    apagadas = await ctx.channel.purge(limit=quantidade + 1)
+
+    msg = await ctx.send(f"🧹 {len(apagadas) - 1} mensagens apagadas com sucesso!")
+    # Apaga a mensagem de confirmação depois de 5 segundos
+    await msg.delete(delay=5)
+
+@clear.error
+async def clear_error(ctx, error):
+    if isinstance(error, commands.MissingPermissions):
+        await ctx.send("❌ Você não tem permissão para usar esse comando.")
+    elif isinstance(error, commands.MissingRequiredArgument):
+        await ctx.send("❌ Use: `$clear <quantidade>`")
+    elif isinstance(error, commands.BadArgument):
+        await ctx.send("❌ A quantidade precisa ser um número.")
 
 bot.run('')
