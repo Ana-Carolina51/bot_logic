@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 import random
 import os
+import requests
 
 # Importar pass_gen do bot_logic.py  
 from geradorsenha import pass_gen
@@ -13,17 +14,21 @@ intents.message_content = True
 # Criar um bot e passar as permissões
 bot = commands.Bot(command_prefix='$', intents=intents)
 
+
 @bot.event
 async def on_ready():
     print(f'Fizemos login como {bot.user}')
+
 
 @bot.command()
 async def hello(ctx):
     await ctx.send("Hello!")
 
+
 @bot.command()
 async def senha(ctx):
     await ctx.send("Sua senha é: " + pass_gen(10))
+
 
 @bot.command()
 async def caraoucoroa(ctx):
@@ -33,27 +38,53 @@ async def caraoucoroa(ctx):
     elif random1 == 2:
         await ctx.send("A moeda saiu coroa!")
 
+
 @bot.command()
 async def bye(ctx):
     await ctx.send("\U0001f642")
+
 
 @bot.command()
 async def emoji(ctx):
     await ctx.send("🎮")
 
+def get_poke_image_url():
+    poke_id = random.randint(1, 151)  # Pokémon da 1ª geração
+    url = f'https://pokeapi.co/api/v2/pokemon/{poke_id}'
+
+    res = requests.get(url)
+    data = res.json()
+
+    # pega a imagem do Pokémon
+    image_url = data['sprites']['front_default']
+    nome = data['name'].capitalize()
+
+    return nome, image_url
+
+
+@bot.command('poke')
+async def poke(ctx):
+    nome, image_url = get_poke_image_url()
+    await ctx.send(f"⚡ Pokémon sorteado: **{nome}**")
+    await ctx.send(image_url)
+
+
 @bot.command()
 async def gif(ctx):
     await ctx.send("https://tenor.com/view/marceline-bubbline-adventure-time-princess-bubblegum-best-friends-gif-14213958")
+
 
 @bot.command()
 async def users(ctx):
     quantidade = ctx.guild.member_count
     await ctx.send(f"Há {quantidade} usuários no servidor")
 
+
 @bot.command()
 async def id(ctx):
     user_id = ctx.author.id
     await ctx.send(f"Seu id é {user_id}")
+
 
 @bot.command()
 async def meme(ctx):
@@ -65,10 +96,12 @@ async def meme(ctx):
 
     await ctx.send(file=picture)
 
+
 @bot.command()
 async def dado(ctx):
     numero = random.randint(1, 6)
     await ctx.send(f"🎲 O dado caiu em **{numero}**!")
+
 
 @bot.command()
 async def ppt(ctx, escolha: str = None):
@@ -102,6 +135,7 @@ async def ppt(ctx, escolha: str = None):
         f"{resultado}"
     )
 
+
 @bot.command()
 @commands.has_permissions(manage_messages=True)
 async def clear(ctx, quantidade: int):
@@ -124,5 +158,25 @@ async def clear_error(ctx, error):
         await ctx.send("❌ Use: `$clear <quantidade>`")
     elif isinstance(error, commands.BadArgument):
         await ctx.send("❌ A quantidade precisa ser um número.")
+
+
+@bot.command()
+async def animals(ctx):
+    pasta = "memes/animals"
+
+    arquivos = [
+        f for f in os.listdir(pasta)
+        if os.path.isfile(os.path.join(pasta, f))
+    ]
+
+    if not arquivos:
+        await ctx.send("❌ Não encontrei memes de animais.")
+        return
+
+    meme = random.choice(arquivos)
+    caminho = os.path.join(pasta, meme)
+
+    await ctx.send(file=discord.File(caminho))
+
 
 bot.run('')
